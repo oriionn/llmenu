@@ -67,7 +67,12 @@ class _ViewState extends State<View> {
     }
 
     String _formatDate() {
-        return DateFormat('d MMMM y', 'fr_FR').format(dates[index]);
+        DateFormat format = DateFormat('d MMMM y', 'fr_FR');
+        if (dates.isEmpty) {
+            return format.format(DateTime.now());
+        }
+
+        return format.format(dates[index]);
     }
 
     int _findDate(DateTime d1) {
@@ -158,6 +163,15 @@ class _ViewState extends State<View> {
                 child: const Icon(Icons.calendar_month),
             ),
             backgroundColor: Theme.of(context).colorScheme.surface,
+            bottomNavigationBar: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 10),
+                        child: Text("Développée avec ❤️ par Orion"),
+                    )
+                ],
+            )
         );
     }
 }
