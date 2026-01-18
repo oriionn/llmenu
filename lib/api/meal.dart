@@ -43,14 +43,6 @@ Future<List<Meal>> fetchMeal() async {
             meals.add(Meal.fromJson(v));
         }
 
-        // temp
-        meals.add(Meal(
-            starter: "Salade",
-            mainCourse: "Kebab avec la sauce du chef",
-            dessert: "Tiramisu Bueno",
-            date: DateTime.now().add(Duration(days: 50))
-        ));
-
         return meals;
     } else {
         throw Exception("Failed to load meal");

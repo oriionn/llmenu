@@ -66,15 +66,46 @@ class _ViewState extends State<View> {
         super.dispose();
     }
 
-    String formatDate() {
+    String _formatDate() {
         return DateFormat('d MMMM y', 'fr_FR').format(dates[index]);
+    }
+
+    int _findDate(DateTime d1) {
+        var i = dates.indexWhere((d) => (
+            d1.day == d.day &&
+            d1.month == d.month &&
+            d1.year == d.year
+        ));
+
+        return i;
+    }
+
+    Future<void> _selectDate() async {
+        final DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: dates[index],
+            firstDate: dates[0],
+            lastDate: dates.last,
+            selectableDayPredicate: (DateTime date) {
+                return _findDate(date) != -1;
+            }
+        );
+
+        var i = _findDate(pickedDate!);
+
+        if (i != -1) {
+            _pageController.jumpToPage(i);
+            setState(() {
+                index = i;
+            });
+        }
     }
 
     @override
     Widget build(BuildContext context) {
         return Scaffold(
             appBar: AppBar(
-                title: Text(formatDate()),
+                title: Text(_formatDate()),
             ),
             body: FutureBuilder<List<Meal>>(
                 future: futureMeals,
@@ -82,6 +113,12 @@ class _ViewState extends State<View> {
                     if (snapshot.hasData) {
                         List<Meal> data = snapshot.data!;
                         dates = [];
+
+                        if (data[0].mainCourse.toLowerCase().startsWith("pas de menu")) {
+                            return Center(
+                                child: Text("Aucun menu disponible"),
+                            );
+                        }
 
                         List<Menu> pages = [];
                         for (var v in data) {
@@ -97,6 +134,7 @@ class _ViewState extends State<View> {
                         }
 
                         return PageView(
+                            controller: _pageController,
                             scrollDirection: Axis.horizontal,
                             children: pages,
                             onPageChanged: (i) {
@@ -115,7 +153,7 @@ class _ViewState extends State<View> {
                 },
             ),
             floatingActionButton: FloatingActionButton(
-                onPressed: () {},
+                onPressed: _selectDate,
                 tooltip: 'Sélectionner une date',
                 child: const Icon(Icons.calendar_month),
             ),
