@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:menu_llm/api/meal.dart';
+import 'package:menu_llm/components/link.dart';
 import 'package:menu_llm/components/menu.dart';
 
 void main() {
@@ -163,14 +164,19 @@ class _ViewState extends State<View> {
                 child: const Icon(Icons.calendar_month),
             ),
             backgroundColor: Theme.of(context).colorScheme.surface,
-            bottomNavigationBar: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                    Padding(
-                        padding: EdgeInsets.only(bottom: 10),
-                        child: Text("Développée avec ❤️ par Orion"),
-                    )
-                ],
+            bottomNavigationBar: Padding(
+                padding: EdgeInsets.only(bottom: 10),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 0,
+                    children: [
+                        Text("Développée avec ❤️ par"),
+                        Link(
+                            content: "Orion",
+                            href: "https://github.com/oriionn",
+                        )
+                    ],
+                ),
             )
         );
     }
