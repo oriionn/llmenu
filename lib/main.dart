@@ -1,8 +1,12 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
+import 'package:menu_llm/api/meal.dart';
 import 'package:menu_llm/components/menu.dart';
 
 void main() {
+    initializeDateFormatting("fr_FR");
     runApp(const App());
 }
 
@@ -43,19 +47,72 @@ class View extends StatefulWidget {
 }
 
 class _ViewState extends State<View> {
+    final PageController _pageController = PageController();
+    int index = 0;
+
+    late Future<List<Meal>> futureMeals;
+    DateTime date = DateTime.now();
+    List<DateTime> dates = [DateTime.now()];
+
+    @override
+    void initState() {
+        super.initState();
+        futureMeals = fetchMeal();
+    }
+
+    @override
+    void dispose() {
+        _pageController.dispose();
+        super.dispose();
+    }
+
+    String formatDate() {
+        return DateFormat('d MMMM y', 'fr_FR').format(dates[index]);
+    }
+
     @override
     Widget build(BuildContext context) {
         return Scaffold(
             appBar: AppBar(
-                title: Text("17 janvier 2026"),
+                title: Text(formatDate()),
             ),
-            body: PageView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                    Menu(),
-                    Menu(),
-                    Menu()
-                ],
+            body: FutureBuilder<List<Meal>>(
+                future: futureMeals,
+                builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                        List<Meal> data = snapshot.data!;
+                        dates = [];
+
+                        List<Menu> pages = [];
+                        for (var v in data) {
+                            pages.add(
+                                Menu(
+                                    starter: v.starter,
+                                    mainCourse: v.mainCourse,
+                                    dessert: v.dessert,
+                                )
+                            );
+
+                            dates.add(v.date);
+                        }
+
+                        return PageView(
+                            scrollDirection: Axis.horizontal,
+                            children: pages,
+                            onPageChanged: (i) {
+                                setState(() {
+                                    index = i;
+                                });
+                            },
+                        );
+                    } else if (snapshot.hasError) {
+                        return Text('${snapshot.error!}');
+                    }
+
+                    return const Center(
+                        child: CircularProgressIndicator(),
+                    );
+                },
             ),
             floatingActionButton: FloatingActionButton(
                 onPressed: () {},
