@@ -1,16 +1,24 @@
-# menu_llm
+# LLMenu
+Une petite application, d'abord développée pour Android, qui vous permet de regarder le menu de la cantine du **Lycée Louis Marchal** en toute tranquilité en profitant du design [Material 3](https://m3.material.io/).
 
-A new Flutter project.
+## Comment j'ai fait ?
+L'application créée par le professeur de NSI, disponible [ici](https://play.google.com/store/apps/details?id=fr.free.buchi.prof.menucantine) fait une simple requête HTTP à un serveur Flask, il m'a suffit d'utiliser un **Man In The Middle** (en l'occurence, j'ai utilisé [HTTP Toolkit](https://httptoolkit.com/)) pour récupérer l'endpoint utilisé et ainsi reproduire la même requête que l'application originale.
 
-## Getting Started
+## Développement
+### Prérequis
+- Flutter
 
-This project is a starting point for a Flutter application.
+### Développer
+Pour lancer la version développement de l'application :
+```sh
+git clone https://github.com/oriionn/llmenu.git
+cd llmenu
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Compilation
+### Android
+```sh
+flutter build apk
+```
