@@ -54,6 +54,7 @@ class _ViewState extends State<View> {
     late Future<List<Meal>> futureMeals;
     DateTime date = DateTime.now();
     List<DateTime> dates = [DateTime.now()];
+    bool _showDatePicker = false;
 
     @override
     void initState() {
@@ -139,6 +140,8 @@ class _ViewState extends State<View> {
                             dates.add(v.date);
                         }
 
+                        _showDatePicker = true;
+
                         return PageView(
                             controller: _pageController,
                             scrollDirection: Axis.horizontal,
@@ -158,11 +161,11 @@ class _ViewState extends State<View> {
                     );
                 },
             ),
-            floatingActionButton: FloatingActionButton(
+            floatingActionButton: _showDatePicker == true ? FloatingActionButton(
                 onPressed: _selectDate,
                 tooltip: 'Sélectionner une date',
                 child: const Icon(Icons.calendar_month),
-            ),
+            ):null,
             backgroundColor: Theme.of(context).colorScheme.surface,
             bottomNavigationBar: Padding(
                 padding: EdgeInsets.only(bottom: 10),
