@@ -98,6 +98,7 @@ class _ViewState extends State<View> {
             }
         );
 
+        if (pickedDate == null) return;
         var i = _findDate(pickedDate!);
 
         if (i != -1) {
@@ -161,11 +162,20 @@ class _ViewState extends State<View> {
                     );
                 },
             ),
-            floatingActionButton: _showDatePicker == true ? FloatingActionButton(
-                onPressed: _selectDate,
-                tooltip: 'Sélectionner une date',
-                child: const Icon(Icons.calendar_month),
-            ):null,
+            floatingActionButton: FutureBuilder<List<Meal>>(
+                future: futureMeals,
+                builder: (context, snapshot) {
+                    if (snapshot.hasData && !snapshot.data![0].mainCourse.toLowerCase().startsWith("pas de menu")) {
+                        return FloatingActionButton(
+                            onPressed: _selectDate,
+                            tooltip: 'Sélectionner une date',
+                            child: const Icon(Icons.calendar_month),
+                        );
+                    }
+
+                    return const SizedBox.shrink();
+                }
+            ),
             backgroundColor: Theme.of(context).colorScheme.surface,
             bottomNavigationBar: Padding(
                 padding: EdgeInsets.only(bottom: 10),
