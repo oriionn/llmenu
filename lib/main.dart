@@ -54,7 +54,6 @@ class _ViewState extends State<View> {
     late Future<List<Meal>> futureMeals;
     DateTime date = DateTime.now();
     List<DateTime> dates = [DateTime.now()];
-    bool _showDatePicker = false;
 
     @override
     void initState() {
@@ -140,8 +139,6 @@ class _ViewState extends State<View> {
 
                             dates.add(v.date);
                         }
-
-                        _showDatePicker = true;
 
                         return PageView(
                             controller: _pageController,
