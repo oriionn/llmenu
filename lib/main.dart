@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:menu_llm/api/meal.dart';
 import 'package:menu_llm/components/link.dart';
 import 'package:menu_llm/components/menu.dart';
+import 'package:menu_llm/utils/platform.dart';
 
 void main() {
     initializeDateFormatting("fr_FR");
@@ -22,6 +26,12 @@ class App extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
+        if (isIOS()) {
+            return CupertinoApp(
+                home: const IOSView(),
+            );
+        }
+
         return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
             return MaterialApp(
                 title: 'Menu du Lycée Louis Marchal',
@@ -34,25 +44,24 @@ class App extends StatelessWidget {
                     useMaterial3: true,
                 ),
                 themeMode: ThemeMode.dark,
-                home: const View(),
+                home: const AndroidView(),
             );
         });
     }
 }
 
-class View extends StatefulWidget {
-    const View({super.key});
+class AndroidView extends StatefulWidget {
+    const AndroidView({super.key});
 
     @override
-    State<View> createState() => _ViewState();
+    State<AndroidView> createState() => _AndroidViewState();
 }
 
-class _ViewState extends State<View> {
+class _AndroidViewState extends State<AndroidView> {
     final PageController _pageController = PageController();
     int index = 0;
 
     late Future<List<Meal>> futureMeals;
-    DateTime date = DateTime.now();
     List<DateTime> dates = [DateTime.now()];
 
     @override
@@ -98,7 +107,7 @@ class _ViewState extends State<View> {
         );
 
         if (pickedDate == null) return;
-        var i = _findDate(pickedDate!);
+        var i = _findDate(pickedDate);
 
         if (i != -1) {
             _pageController.jumpToPage(i);
@@ -114,49 +123,15 @@ class _ViewState extends State<View> {
             appBar: AppBar(
                 title: Text(_formatDate()),
             ),
-            body: FutureBuilder<List<Meal>>(
-                future: futureMeals,
-                builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                        List<Meal> data = snapshot.data!;
-                        dates = [];
-
-                        if (data[0].mainCourse.toLowerCase().startsWith("pas de menu")) {
-                            return Center(
-                                child: Text("Aucun menu disponible"),
-                            );
-                        }
-
-                        List<Menu> pages = [];
-                        for (var v in data) {
-                            pages.add(
-                                Menu(
-                                    starter: v.starter,
-                                    mainCourse: v.mainCourse,
-                                    dessert: v.dessert,
-                                )
-                            );
-
-                            dates.add(v.date);
-                        }
-
-                        return PageView(
-                            controller: _pageController,
-                            scrollDirection: Axis.horizontal,
-                            children: pages,
-                            onPageChanged: (i) {
-                                setState(() {
-                                    index = i;
-                                });
-                            },
-                        );
-                    } else if (snapshot.hasError) {
-                        return Text('${snapshot.error!}');
-                    }
-
-                    return const Center(
-                        child: CircularProgressIndicator(),
-                    );
+            body: Pages(
+                pageController: _pageController,
+                onLoad: (List<DateTime> d) {
+                    dates = d;
+                },
+                onPageChanged: (int i) {
+                    setState(() {
+                        index = i;
+                    });
                 },
             ),
             floatingActionButton: FutureBuilder<List<Meal>>(
@@ -188,6 +163,62 @@ class _ViewState extends State<View> {
                     ],
                 ),
             )
+        );
+    }
+}
+
+class IOSView extends StatefulWidget {
+    const IOSView({super.key});
+
+    @override
+    State<IOSView> createState() => _IOSViewState();
+}
+
+class _IOSViewState extends State<IOSView> {
+    final PageController _pageController = PageController();
+    int index = 0;
+
+    late Future<List<Meal>> futureMeals;
+    List<DateTime> dates = [DateTime.now()];
+
+    @override
+    void initState() {
+        super.initState();
+        futureMeals = fetchMeal();
+    }
+
+    @override
+    void dispose() {
+        _pageController.dispose();
+        super.dispose();
+    }
+
+    String _formatDate() {
+        DateFormat format = DateFormat('d MMMM y', 'fr_FR');
+        if (dates.isEmpty) {
+            return format.format(DateTime.now());
+        }
+
+        return format.format(dates[index]);
+    }
+
+    @override
+    Widget build(BuildContext context) {
+        return CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(
+                middle: Text(_formatDate()),
+            ),
+            child: Pages(
+                pageController: _pageController,
+                onLoad: (List<DateTime> d) {
+                    dates = d;
+                },
+                onPageChanged: (int i) {
+                    setState(() {
+                        index = i;
+                    });
+                },
+            ),
         );
     }
 }
