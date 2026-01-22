@@ -3,37 +3,55 @@ import 'dart:io';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:menu_llm/api/meal.dart';
 import 'package:menu_llm/components/link.dart';
 import 'package:menu_llm/components/menu.dart';
 import 'package:menu_llm/utils/platform.dart';
+import 'package:menu_llm/utils/theme.dart';
 
-void main() {
+void main() async {
+    WidgetsFlutterBinding.ensureInitialized();
     initializeDateFormatting("fr_FR");
+    await GetStorage.init();
     runApp(const App());
 }
 
-class App extends StatelessWidget {
-    const App({super.key});
+class App extends StatefulWidget {
+    const App({ super.key });
 
-    static final _defaultLightColorScheme =
-        ColorScheme.fromSwatch(primarySwatch: Colors.indigo);
+    @override
+    State<App> createState() => _AppState();
+}
 
-    static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
-        primarySwatch: Colors.indigo, brightness: Brightness.dark);
+class _AppState extends State<App> {
+
+    static final _defaultLightColorScheme = ColorScheme.fromSeed(
+        seedColor:  Colors.blueAccent,
+        brightness: Brightness.light,
+    );
+
+    static final _defaultDarkColorScheme = ColorScheme.fromSeed(
+        seedColor:  Colors.blueAccent,
+        brightness: Brightness.dark,
+    );
 
     @override
     Widget build(BuildContext context) {
         if (isIOS()) {
-            return CupertinoApp(
+            return GetCupertinoApp(
                 home: const IOSView(),
+                theme: CupertinoThemeData(
+                    brightness: ThemeService().theme == ThemeMode.dark ? Brightness.dark:Brightness.light
+                ),
             );
         }
 
         return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
-            return MaterialApp(
+            return GetMaterialApp(
                 title: 'Menu du Lycée Louis Marchal',
                 theme: ThemeData(
                     colorScheme: lightColorScheme ?? _defaultLightColorScheme,
@@ -43,8 +61,8 @@ class App extends StatelessWidget {
                     colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
                     useMaterial3: true,
                 ),
-                themeMode: ThemeMode.dark,
-                home: const AndroidView(),
+                themeMode: ThemeService().theme,
+                home: AndroidView(),
             );
         });
     }
@@ -59,6 +77,7 @@ class AndroidView extends StatefulWidget {
 
 class _AndroidViewState extends State<AndroidView> {
     final PageController _pageController = PageController();
+    final ThemeService _themeService = ThemeService();
     int index = 0;
 
     late Future<List<Meal>> futureMeals;
@@ -122,6 +141,12 @@ class _AndroidViewState extends State<AndroidView> {
         return Scaffold(
             appBar: AppBar(
                 title: Text(_formatDate()),
+                actions: [
+                    IconButton(
+                        icon: Icon(_themeService.theme == ThemeMode.dark ? Icons.dark_mode:Icons.light_mode),
+                        onPressed: _themeService.switchTheme,
+                    )
+                ],
             ),
             body: Pages(
                 pageController: _pageController,
@@ -176,6 +201,7 @@ class IOSView extends StatefulWidget {
 
 class _IOSViewState extends State<IOSView> {
     final PageController _pageController = PageController();
+    final ThemeService _themeService = ThemeService();
     int index = 0;
 
     late Future<List<Meal>> futureMeals;
@@ -207,6 +233,10 @@ class _IOSViewState extends State<IOSView> {
         return CupertinoPageScaffold(
             navigationBar: CupertinoNavigationBar(
                 middle: Text(_formatDate()),
+                trailing: IconButton(
+                    icon: Icon(_themeService.theme == ThemeMode.dark ? Icons.dark_mode:Icons.light_mode),
+                    onPressed: _themeService.switchTheme,
+                ),
             ),
             child: Pages(
                 pageController: _pageController,
