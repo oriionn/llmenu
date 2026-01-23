@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +41,7 @@ class _AppState extends State<App> {
     Widget build(BuildContext context) {
         if (isIOS()) {
             return GetCupertinoApp(
+                title: "LLMenu",
                 home: const IOSView(),
                 theme: CupertinoThemeData(
                     brightness: ThemeService().theme == ThemeMode.dark ? Brightness.dark:Brightness.light
@@ -52,7 +51,7 @@ class _AppState extends State<App> {
 
         return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
             return GetMaterialApp(
-                title: 'Menu du Lycée Louis Marchal',
+                title: 'LLMenu',
                 theme: ThemeData(
                     colorScheme: lightColorScheme ?? _defaultLightColorScheme,
                     useMaterial3: true,
