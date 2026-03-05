@@ -1,4 +1,4 @@
-For english speaker, there is a [english](README.en.md) translation here.
+For english speaker, there is a english translation [here](README.en.md).
 
 # LLMenu
 Une petite application, d'abord développée pour Android, qui vous permet de regarder le menu de la cantine du **Lycée Louis Marchal** en toute tranquilité en profitant du design [Material 3](https://m3.material.io/) pour Android et du design Cupertino pour iOS.
