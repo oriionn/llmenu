@@ -1,3 +1,5 @@
+For english speaker, there is a [english] translation here.
+
 # LLMenu
 Une petite application, d'abord développée pour Android, qui vous permet de regarder le menu de la cantine du **Lycée Louis Marchal** en toute tranquilité en profitant du design [Material 3](https://m3.material.io/) pour Android et du design Cupertino pour iOS.
 
@@ -11,7 +13,7 @@ L'application créée par le professeur de NSI, disponible [ici](https://play.go
 ### Développer
 Pour lancer la version développement de l'application :
 ```sh
-git clone https://github.com/oriionn/llmenu.git
+git clone https://git.oriondev.fr/orion/llmenu.git
 cd llmenu
 flutter pub get
 flutter run
